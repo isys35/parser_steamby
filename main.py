@@ -50,9 +50,8 @@ def main():
     exceptions_titles = ['SILVER', 'DIAMOND - Игры от 899 рублей', 'GOLD']
     for i in range(1, pages + 1):
         print('страница %i' %i)
-        #browser = webdriver.Firefox(options=options)
-        try
-        browser = webdriver.Firefox()
+        browser = webdriver.Firefox(options=options)
+        #browser = webdriver.Firefox()
         page_url = '?page=%i' % i
         browser.get(url + page_url)
         requiredHtml = browser.page_source
