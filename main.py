@@ -19,7 +19,6 @@ def benchmark(func):
     return wrapper
 
 
-
 @benchmark
 def count_pages():
     print('Определение кол-ва страниц...')
@@ -57,6 +56,7 @@ def save_data_excel(data):
         ws.write(id+1, 1, data[id][keys[1]])
     wb.save('data.xls')
 
+# test git
 
 def main():
     pages = int(count_pages())
@@ -65,7 +65,6 @@ def main():
     for i in range(1, pages + 1):
         print('страница %i' %i)
         browser = webdriver.Firefox(options=options)
-        #browser = webdriver.Firefox()
         page_url = '?page=%i' % i
         browser.get(url + page_url)
         requiredHtml = browser.page_source
