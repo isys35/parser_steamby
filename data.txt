@@ -1,25 +1,11 @@
-DiRT Rally,25 р
-Grand Theft Auto V + Premium + Online,699 р
-ARK: Survival Evolved,345 р
-PLAYERUNKNOWN'S BATTLEGROUNDS,399 р
-Red Dead Redemption 2,1799 р
-Borderlands 2 - Game of the Year,245 р
-Mortal Kombat 11 Premium Edition,799 р
-RESIDENT EVIL 2,599 р
-Darksiders Genesis,745 р
-The Amazing Spider-Man,145 р
-Crusader Kings II: Ruler Designer,75 р
-Jagged Alliance 2 - Wildfire,9 р
-S.T.A.L.K.E.R.: Bundle,199 р
-Killing Floor,99 р
-Two Worlds Epic Edition,9 р
-The Elder Scrolls V: Skyrim,145 р
-Move or Die,135 р
-The Elder Scrolls Online: Tamriel Unlimited + Morrowind,345 р
-Human: Fall Flat,199 р
-STAR WARS Battlefront,299 р
-S.T.A.L.K.E.R.: Call of Pripyat,75 р
-Red Dead Redemption 2: Ultimate Edition,2795 р
-Dead Rising 2,145 р
-Prototype 2 + Radnet,99 р
-Call of Duty: Black Ops,445 р
+DiRT Rally,25.0
+PLAYERUNKNOWN'S BATTLEGROUNDS,399.0
+ARK: Survival Evolved,345.0
+Tom Clancy's Rainbow Six Siege,395.0
+The Elder Scrolls Online: Tamriel Unlimited + Morrowind,345.0
+Red Dead Redemption 2,1799.0
+GRID 2 + 2 DLC,65.0
+Terraria,145.0
+Two Worlds Epic Edition,9.0
+DARK SOULS III,399.0
+DOOM,245.0

@@ -1,7 +1,7 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from selenium.webdriver.firefox.options import Options
-
+import xlwt
 url = 'https://steambuy.com/catalog/'  # ссылка на каталог
 options = Options()
 options.headless = True
@@ -17,6 +17,7 @@ def benchmark(func):
         print('[*] Время выполнения: {} секунд.'.format(end - start))
         return return_value
     return wrapper
+
 
 
 @benchmark
@@ -37,11 +38,24 @@ def count_pages():
     return pages_list[-1]
 
 
-def save_data(data):
+def save_data_txt(data):
     f = open('data.txt', 'w',encoding="utf-8")
     for el in data:
-        f.write(el['title'] + ',' + el['cost'] + '\n')
+        f.write(el['title'] + ',' + str(el['cost']) + '\n')
     f.close()
+
+
+def save_data_excel(data):
+    wb = xlwt.Workbook()
+    ws = wb.add_sheet('Data')
+    keys = [k for k in data[-1].keys()]
+    ws.col(0).width = 15000
+    ws.write(0, 0, keys[0])
+    ws.write(0, 1, keys[1])
+    for id in range(0, len(data)):
+        ws.write(id+1, 0, data[id][keys[0]])
+        ws.write(id+1, 1, data[id][keys[1]])
+    wb.save('data.xls')
 
 
 def main():
@@ -61,11 +75,14 @@ def main():
             title = product.select('.product-item__title > a')
             cost = product.select('.product-item__cost')
             if cost[0].text != 'СКОРО' and title[0].text not in exceptions_titles:
-                games.append({'title': title[0].text, 'cost': cost[0].text})
+                cost = cost[0].text.replace(' р', '')
+                games.append({'title': title[0].text, 'cost': float(cost)})
                 print(games[-1]['title'])
         browser.quit()
-        save_data(games)
+        save_data_txt(games)
+        save_data_excel(games)
 
 
 if __name__ == "__main__":
     main()
+
