@@ -7,20 +7,7 @@ options = Options()
 options.headless = True
 
 
-def benchmark(func):
-    import time
 
-    def wrapper():
-        start = time.time()
-        return_value = func()
-        end = time.time()
-        print('[*] Время выполнения: {} секунд.'.format(end - start))
-        return return_value
-    return wrapper
-
-
-
-@benchmark
 def count_pages():
     print('Определение кол-ва страниц...')
     browser = webdriver.Firefox(options=options)
@@ -39,7 +26,7 @@ def count_pages():
 
 
 def save_data_txt(data):
-    f = open('data.txt', 'w',encoding="utf-8")
+    f = open('data.txt', 'w', encoding="utf-8")
     for el in data:
         f.write(el['title'] + ',' + str(el['cost']) + '\n')
     f.close()
