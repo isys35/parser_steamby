@@ -44,25 +44,27 @@ def get_json_from_catalog(offset, page):
 def get_max_page():
     json_from_catalog = get_json_from_catalog(0, 1)
     games_count = int(json_from_catalog['total'])
-    return int(games_count/20) + 1
+    return int(games_count / 20) + 1
 
 
-def parsing():
+def parsing_with_save_catalog_html():
     max_page = get_max_page()
     page = 1
     offset = 0
     while page != max_page:
         json_from_catalog = get_json_from_catalog(offset, page)
         page_html = json_from_catalog['html']
-        soup = BeautifulSoup(page_html, 'lxml')
-        product_list = soup.select_one('.product-list')
-        for product in product_list.select('div.product-item'):
-            goods_title = product.select_one('a.product-item__title-link').text
-            release_date = ''
-
-        break
+        print(page)
+        save_page(page_html, 'all_html\\{}.html'.format(page))
         page += 1
         offset += 20
+
+
+# soup = BeautifulSoup(page_html, 'lxml')
+# product_list = soup.select_one('.product-list')
+# for product in product_list.select('div.product-item'):
+#     goods_title = product.select_one('a.product-item__title-link').text
+#     release_date = ''
 
 
 if __name__ == '__main__':
@@ -70,4 +72,4 @@ if __name__ == '__main__':
     # save_json(json_from_catalog)
     # response = requests.get(URl_TEST, headers=HEADERS)
     # save_page(response.text, 'page2.html')
-    parsing()
+    parsing_with_save_catalog_html()
