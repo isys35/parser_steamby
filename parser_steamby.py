@@ -2,6 +2,7 @@ import requests
 import random
 import json
 from bs4 import BeautifulSoup
+import os
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0',
@@ -23,6 +24,8 @@ URL = 'https://steambuy.com/ajax/_get.php?rnd={}&offset={}&region_free=0&sort=cn
 URl_API = 'http://steammachine.ru/api/good/?id_good={}&v=1&format=json'
 
 URl_TEST = 'https://steambuy.com/steam/pillars-of-eternity-ii-deadfire-season-pass/'
+
+HOST = 'https://steambuy.com'
 
 
 def save_page(response_str, file_name='page.html'):
@@ -55,9 +58,23 @@ def parsing_with_save_catalog_html():
         json_from_catalog = get_json_from_catalog(offset, page)
         page_html = json_from_catalog['html']
         print(page)
-        save_page(page_html, 'all_html\\{}.html'.format(page))
+        save_page(page_html, 'catalog_html\\{}.html'.format(page))
         page += 1
         offset += 20
+
+
+def parsing_by_catalog_html_with_save_game_html():
+    catalog_html = 'catalog_html'
+    game_html = 'game_html'
+    for page_html in os.listdir(catalog_html):
+        with open('{}//{}'.format(catalog_html, page_html), 'r', encoding='utf8') as page_html_file:
+            page_soup = BeautifulSoup(page_html_file.read(), 'lxml')
+        for product in page_soup.select('div.product-item'):
+            id = product.select_one('.product-item__btn')['data-id']
+            url = HOST + product.select_one('a.product-item__title-link')['href']
+            response = requests.get(url, headers=HEADERS)
+            save_page(response.text, '{}//{}.html'.format(game_html, id))
+            print(id)
 
 
 # soup = BeautifulSoup(page_html, 'lxml')
@@ -72,4 +89,4 @@ if __name__ == '__main__':
     # save_json(json_from_catalog)
     # response = requests.get(URl_TEST, headers=HEADERS)
     # save_page(response.text, 'page2.html')
-    parsing_with_save_catalog_html()
+    parsing_by_catalog_html_with_save_game_html()
