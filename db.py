@@ -26,12 +26,21 @@ def add_game_in_db(data):
         check_data = cur.fetchone()
         if check_data is None:
             query = "INSERT INTO `items` (`goods_title`, `release_date`, `genres`, `description`, `systemreq`," \
-                "`thumbnail`, `platform`, `lang`, `activation`, `real_price`, `publisher`, `goods_type`, `price`, " \
-                "`new_tab`, `leader_tab`, `preorder_tab`, `offer_day`, `in_stock`, `digiseller_id`, `video`, `views`)" \
-                " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,)"
+                    "`thumbnail`, `platform`, `lang`, `activation`, `real_price`, `publisher`, `goods_type`, `price`, " \
+                    "`new_tab`, `leader_tab`, `preorder_tab`, `offer_day`, `in_stock`, `digiseller_id`, `video`, `views`)" \
+                    " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,)"
             cur.execute(query, data)
 
 
+def get_genres():
+    with con.cursor() as cur:
+        query = "SELECT genreID,genreName FROM genres"
+        cur.execute(query)
+        genres_dict = {genre[1]: genre[0] for genre in cur.fetchall()}
+        return genres_dict
+
+
 if __name__ == '__main__':
-    data = ['The Long Dark']
-    add_game_in_db(data)
+    # data = ['The Long Dark']
+    # add_game_in_db(data)
+    print(get_genres())
