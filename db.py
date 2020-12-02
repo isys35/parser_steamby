@@ -1,4 +1,5 @@
 import pymysql
+from pymysql.err import OperationalError
 
 # con = pymysql.connect('localhost', 'root', 'a31081993abc', 'games', port=3306)
 #
@@ -6,8 +7,10 @@ import pymysql
 #     cur.execute("SELECT VERSION()")
 #     version = cur.fetchone()
 #     print("Database version: {}".format(version[0]))
-
-con = pymysql.connect('localhost', 'root', 'a31081993abc', 'games', port=3306)
+try:
+    con = pymysql.connect('localhost', 'root', 'a31081993abc', 'games', port=3306)
+except OperationalError:
+    con = None
 
 
 def add_games_in_db(data):
