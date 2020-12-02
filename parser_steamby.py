@@ -28,6 +28,7 @@ HOST = 'https://steambuy.com'
 CATALOG_HTML_PATH = 'catalog_html'
 GAME_HTML_PATH = 'game_html'
 GAME_JSON_PATH = 'game_json'
+IMAGES_PATH = 'images'
 
 
 # GENRES = db.get_genres()
@@ -37,6 +38,7 @@ def make_dirs():
     os.mkdir(CATALOG_HTML_PATH)
     os.mkdir(GAME_HTML_PATH)
     os.mkdir(GAME_JSON_PATH)
+    os.mkdir(IMAGES_PATH)
 
 
 def save_page(response_str, file_name='page.html'):
@@ -79,7 +81,7 @@ def parsing_catalog(html_save=True, load_local_html=False):
             page += 1
             offset += 20
             if html_save:
-                save_page(page_html, 'catalog_html\\{}.html'.format(page))
+                save_page(page_html, 'catalog_html/{}.html'.format(page))
             yield page_html
 
 
@@ -150,8 +152,8 @@ def parsing_games(load_local_catalog_html=True,
         for product in page_soup.select('div.product-item'):
             id = product.select_one('.product-item__btn')['data-id']
             print(id)
-            game_html_path = '{}//{}.html'.format(GAME_HTML_PATH, id)
-            game_json_path = '{}//{}.json'.format(GAME_JSON_PATH, id)
+            game_html_path = '{}/{}.html'.format(GAME_HTML_PATH, id)
+            game_json_path = '{}/{}.json'.format(GAME_JSON_PATH, id)
             url_html = HOST + product.select_one('a.product-item__title-link')['href']
             url_api = URl_API.format(id)
             game_html = get_game_html(game_html_path, url_html, load_local_game_html)
