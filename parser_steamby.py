@@ -105,7 +105,7 @@ def get_game_json(game_json_path, url_api, load_local_json=False):
         else:
             return
     else:
-        response = requests.get(url_api, headers=HEADERS)
+        response = requests.get(url_api)
         game_json = response.json()
         time.sleep(1)
     return game_json
