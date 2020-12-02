@@ -33,7 +33,6 @@ GAME_HTML_PATH = 'game_html'
 GAME_JSON_PATH = 'game_json'
 IMAGES_PATH = 'images'
 
-
 GENRES = db.get_genres()
 
 
@@ -236,7 +235,7 @@ def parse_video(soup):
     return video
 
 
-def parse_data(product_soup, game_soup, game_json):
+def parse_data(product_soup, game_soup, game_json, id):
     good_title = product_soup.select_one('a.product-item__title-link').text
     new_tab, leader_tab, preorder_tab, offer_day = parse_tabs(product_soup)
     release_date = parse_realese_date(product_soup)
@@ -246,6 +245,8 @@ def parse_data(product_soup, game_soup, game_json):
     thumbnail = '{}.png'.format(id)
     platform = parse_platform(game_soup)
     lang = parse_lang(game_soup)
+    if len(lang) > 25:
+        lang = lang.split(' ')[0]
     activation = parse_activation(game_json)
     price = parse_price(game_soup)
     real_price = parse_real_price(game_soup)
@@ -277,7 +278,7 @@ def parsing_games(load_local_catalog_html=True,
     for page_html in catalog:
         page_soup = BeautifulSoup(page_html, 'lxml')
         for product_soup in page_soup.select('div.product-item'):
-            id = product_soup.select_one('.product-item__btn')['data-id']
+            id = int(product_soup.select_one('.product-item__btn')['data-id'])
             print(id)
             game_html_path = '{}/{}.html'.format(GAME_HTML_PATH, id)
             game_json_path = '{}/{}.json'.format(GAME_JSON_PATH, id)
@@ -289,7 +290,9 @@ def parsing_games(load_local_catalog_html=True,
                 continue
             if save_data_in_db:
                 game_soup = BeautifulSoup(game_html, 'lxml')
-                data = parse_data(product_soup, game_soup, game_json)
+                data = parse_data(product_soup, game_soup, game_json, id)
+                if 'Тестовая покупка' in data[0]:
+                    continue
                 db.add_game_in_db(data)
             if download_image:
                 img_url = product_soup.select_one('.product-item__img').select_one('img')['src']
@@ -304,5 +307,5 @@ if __name__ == '__main__':
                   load_local_game_html=True,
                   load_local_json=True,
                   download_image=False,
-                  save_data_in_db=False,
+                  save_data_in_db=True,
                   html_save=False)
