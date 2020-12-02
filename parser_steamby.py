@@ -7,6 +7,7 @@ import json
 import re
 import db
 import httplib2
+from pymysql.err import OperationalError
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0',
@@ -33,7 +34,11 @@ GAME_HTML_PATH = 'game_html'
 GAME_JSON_PATH = 'game_json'
 IMAGES_PATH = 'images'
 
-GENRES = db.get_genres()
+try:
+    GENRES = db.get_genres()
+except OperationalError:
+    GENRES = {'Аркады': 1, 'Экшен': 2, 'Ролевые (RPG)': 3, 'Симуляторы': 4, 'Логические': 5, 'Файтинг': 6,
+              'Онлайн (MMO)': 7, 'Приключение': 8, 'Гонки': 9, 'Спорт': 10, 'Стратегии': 11, 'Прочее': 12}
 
 
 def make_dirs():

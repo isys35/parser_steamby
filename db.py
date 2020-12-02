@@ -1,5 +1,4 @@
 import pymysql
-from pymysql.err import OperationalError
 
 # con = pymysql.connect('localhost', 'root', 'a31081993abc', 'games', port=3306)
 #
@@ -54,3 +53,7 @@ def get_genres():
         cur.execute(query)
         genres_dict = {genre[1]: genre[0] for genre in cur.fetchall()}
         return genres_dict
+
+
+if __name__ == '__main__':
+    print(get_genres())
