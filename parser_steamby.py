@@ -78,10 +78,10 @@ def parsing_catalog(html_save=True, load_local_html=False):
             print(page)
             json_from_catalog = get_json_from_catalog(offset, page)
             page_html = json_from_catalog['html']
-            page += 1
-            offset += 20
             if html_save:
                 save_page(page_html, 'catalog_html/{}.html'.format(page))
+            page += 1
+            offset += 20
             yield page_html
 
 
