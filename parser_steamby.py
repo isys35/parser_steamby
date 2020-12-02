@@ -34,11 +34,8 @@ GAME_HTML_PATH = 'game_html'
 GAME_JSON_PATH = 'game_json'
 IMAGES_PATH = 'images'
 
-try:
-    GENRES = db.get_genres()
-except OperationalError:
-    GENRES = {'Аркады': 1, 'Экшен': 2, 'Ролевые (RPG)': 3, 'Симуляторы': 4, 'Логические': 5, 'Файтинг': 6,
-              'Онлайн (MMO)': 7, 'Приключение': 8, 'Гонки': 9, 'Спорт': 10, 'Стратегии': 11, 'Прочее': 12}
+GENRES = {'Аркады': 1, 'Экшен': 2, 'Ролевые': 3, 'Симуляторы': 4, 'Логические': 5, 'Файтинг': 6,
+          'MMO': 7, 'Приключение': 8, 'Гонки': 9, 'Спорт': 10, 'Стратегии': 11, 'Прочее': 12}
 
 
 def make_dirs():
@@ -275,7 +272,8 @@ def parsing_games(load_local_catalog_html=True,
                   load_local_json=True,
                   download_image=True,
                   save_data_in_db=True,
-                  html_save=True):
+                  html_save=True,
+                  is_continue=False):
     if load_local_catalog_html:
         catalog = parsing_catalog(load_local_html=True)
     else:
@@ -287,6 +285,9 @@ def parsing_games(load_local_catalog_html=True,
             print(id)
             game_html_path = '{}/{}.html'.format(GAME_HTML_PATH, id)
             game_json_path = '{}/{}.json'.format(GAME_JSON_PATH, id)
+            if is_continue:
+                if os.path.isfile(game_html_path) and os.path.isfile(game_json_path):
+                    continue
             url_html = HOST + product_soup.select_one('a.product-item__title-link')['href']
             url_api = URl_API.format(id)
             game_html = get_game_html(game_html_path, url_html, load_local_game_html)
@@ -296,6 +297,7 @@ def parsing_games(load_local_catalog_html=True,
             if save_data_in_db:
                 game_soup = BeautifulSoup(game_html, 'lxml')
                 data = parse_data(product_soup, game_soup, game_json, id)
+                print(data)
                 if 'Тестовая покупка' in data[0]:
                     continue
                 db.add_game_in_db(data)
@@ -308,9 +310,15 @@ def parsing_games(load_local_catalog_html=True,
 
 
 if __name__ == '__main__':
-    parsing_games(load_local_catalog_html=True,
-                  load_local_game_html=True,
-                  load_local_json=True,
-                  download_image=True,
-                  save_data_in_db=False,
-                  html_save=False)
+    while True:
+        try:
+            parsing_games(load_local_catalog_html=False,
+                          load_local_game_html=False,
+                          load_local_json=False,
+                          download_image=True,
+                          save_data_in_db=False,
+                          html_save=True,
+                          is_continue=True)
+            break
+        except ConnectionError:
+            pass
