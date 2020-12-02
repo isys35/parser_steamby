@@ -4,6 +4,9 @@ from bs4 import BeautifulSoup
 import os
 import time
 import json
+import re
+import db
+import httplib2
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0',
@@ -31,7 +34,7 @@ GAME_JSON_PATH = 'game_json'
 IMAGES_PATH = 'images'
 
 
-# GENRES = db.get_genres()
+GENRES = db.get_genres()
 
 
 def make_dirs():
@@ -49,6 +52,13 @@ def save_page(response_str, file_name='page.html'):
 def save_json(data, file_name='data.json'):
     with open(file_name, 'w', encoding='utf8') as json_file:
         json.dump(data, json_file, indent=4, ensure_ascii=True)
+
+
+def save_image(url, image_name):
+    h = httplib2.Http('.cache')
+    response, content = h.request(url)
+    with open("{}".format(image_name), 'wb') as out:
+        out.write(content)
 
 
 def get_json_from_catalog(offset, page):
@@ -139,9 +149,126 @@ def parse_realese_date(soup):
     return realese_date
 
 
+def parse_genre(data: dict):
+    genre = str(GENRES['Прочее'])
+    genres_from_data = data['response']['data']['goods'][0]['genre'].split(', ')
+    for parsed_genre in genres_from_data:
+        if parsed_genre in GENRES:
+            genre = str(GENRES[parsed_genre])
+            break
+    return genre
+
+
+def parse_description(soup):
+    description = ''
+    if soup.select_one('div.product-desc__article'):
+        description = str(soup.select_one('div.product-desc__article'))
+    return description
+
+
+def parse_systemreq(soup):
+    systemreq = ''
+    if soup.select_one('#system'):
+        systemreq = str(soup.select_one('#system'))
+    return systemreq
+
+
+def parse_platform(soup):
+    platform = ''
+    units = soup.select('.product-detail__unit')
+    for unit in units:
+        if 'Работает на:' in unit.text:
+            platform = ', '.join([el.text for el in unit.select('.product-detail__value-link')])
+            break
+    return platform
+
+
+def parse_lang(soup):
+    lang = ''
+    units = soup.select('div.product-about__option-unit')
+    for unit in units:
+        if 'Язык:' in unit.text:
+            lang = unit.select_one('div.product-about__option-value').text
+            break
+    return lang
+
+
+def parse_activation(data: dict):
+    return data['response']['data']['goods'][0]['activation']
+
+
+def parse_price(soup):
+    return int(soup.select_one('.product-price__cost').text.replace(' р', ''))
+
+
+def parse_real_price(soup):
+    real_price_block = soup.select_one('.product-price__discount-cost')
+    real_price = None
+    if real_price_block:
+        real_price = soup.select_one('.product-price__discount-cost').text.replace(' р', '')
+    return real_price
+
+
+def parse_publisher(soup):
+    publisher = ''
+    units = soup.select('.product-detail__unit')
+    for unit in units:
+        if 'Издатель:' in unit.text:
+            publisher = ', '.join([el.text for el in unit.select('.product-detail__value-link')])
+            break
+    return publisher
+
+
+def parse_in_stock(data: dict):
+    if data['response']['data']['goods'][0]['available']:
+        return 'y'
+    else:
+        return 'n'
+
+
+def parse_video(soup):
+    video = ''
+    video_link_block = soup.select_one('.product-media__link.product-media__link_video')
+    if video_link_block:
+        re_search = re.search('https://www.youtube.com/embed/(.+)\?', video_link_block['href'])
+        if re_search:
+            video = re_search.group(1)
+    return video
+
+
+def parse_data(product_soup, game_soup, game_json):
+    good_title = product_soup.select_one('a.product-item__title-link').text
+    new_tab, leader_tab, preorder_tab, offer_day = parse_tabs(product_soup)
+    release_date = parse_realese_date(product_soup)
+    genre = parse_genre(game_json)
+    description = parse_description(game_soup)
+    systemreq = parse_systemreq(game_soup)
+    thumbnail = '{}.png'.format(id)
+    platform = parse_platform(game_soup)
+    lang = parse_lang(game_soup)
+    activation = parse_activation(game_json)
+    price = parse_price(game_soup)
+    real_price = parse_real_price(game_soup)
+    if real_price is None:
+        real_price = str(price)
+    publisher = parse_publisher(game_soup)
+    good_type = 'item'
+    if preorder_tab:
+        good_type = 'comming'
+    in_stock = parse_in_stock(game_json)
+    digiseller_id = id
+    video = parse_video(game_soup)
+    views = 0
+    return good_title, release_date, genre, description, systemreq, thumbnail, platform, lang, activation, real_price, \
+           publisher, good_type, price, new_tab, leader_tab, preorder_tab, offer_day, in_stock, digiseller_id, video, \
+           views
+
+
 def parsing_games(load_local_catalog_html=True,
                   load_local_game_html=True,
                   load_local_json=True,
+                  download_image=True,
+                  save_data_in_db=True,
                   html_save=True):
     if load_local_catalog_html:
         catalog = parsing_catalog(load_local_html=True)
@@ -149,40 +276,33 @@ def parsing_games(load_local_catalog_html=True,
         catalog = parsing_catalog(load_local_html=False, html_save=html_save)
     for page_html in catalog:
         page_soup = BeautifulSoup(page_html, 'lxml')
-        for product in page_soup.select('div.product-item'):
-            id = product.select_one('.product-item__btn')['data-id']
+        for product_soup in page_soup.select('div.product-item'):
+            id = product_soup.select_one('.product-item__btn')['data-id']
             print(id)
             game_html_path = '{}/{}.html'.format(GAME_HTML_PATH, id)
             game_json_path = '{}/{}.json'.format(GAME_JSON_PATH, id)
-            url_html = HOST + product.select_one('a.product-item__title-link')['href']
+            url_html = HOST + product_soup.select_one('a.product-item__title-link')['href']
             url_api = URl_API.format(id)
             game_html = get_game_html(game_html_path, url_html, load_local_game_html)
             game_json = get_game_json(game_json_path, url_api, load_local_json)
             if not game_html or not game_json:
                 continue
-            game_soup = BeautifulSoup(game_html, 'lxml')
-            good_title = product.select_one('a.product-item__title-link').text
-            new_tab, leader_tab, preorder_tab, offer_day = parse_tabs(product)
-            release_date = parse_realese_date(product)
-            print(good_title, release_date, new_tab, leader_tab, preorder_tab, offer_day)
+            if save_data_in_db:
+                game_soup = BeautifulSoup(game_html, 'lxml')
+                data = parse_data(product_soup, game_soup, game_json)
+                db.add_game_in_db(data)
+            if download_image:
+                img_url = product_soup.select_one('.product-item__img').select_one('img')['src']
+                save_image(img_url, '{}/{}.png'.format(IMAGES_PATH, id))
             if html_save:
                 save_page(game_html, game_html_path)
                 save_json(game_json, game_json_path)
 
 
-# soup = BeautifulSoup(page_html, 'lxml')
-# product_list = soup.select_one('.product-list')
-# for product in product_list.select('div.product-item'):
-#     goods_title = product.select_one('a.product-item__title-link').text
-#     release_date = ''
-
-
 if __name__ == '__main__':
-    # json_from_catalog = get_json_from_catalog(0, 1)
-    # save_json(json_from_catalog)
-    # response = requests.get(URl_TEST, headers=HEADERS)
-    # save_page(response.text, 'page2.html')
-    parsing_games(load_local_catalog_html=False,
-                  load_local_game_html=False,
-                  load_local_json=False,
-                  html_save=True)
+    parsing_games(load_local_catalog_html=True,
+                  load_local_game_html=True,
+                  load_local_json=True,
+                  download_image=False,
+                  save_data_in_db=False,
+                  html_save=False)

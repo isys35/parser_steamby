@@ -7,7 +7,6 @@ options = Options()
 options.headless = True
 
 
-
 def count_pages():
     print('Определение кол-ва страниц...')
     browser = webdriver.Firefox(options=options)
