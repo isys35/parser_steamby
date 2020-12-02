@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 import os
 import time
 import json
-import db
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0',
