@@ -3,6 +3,7 @@ import random
 import json
 from bs4 import BeautifulSoup
 import os
+import time
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:82.0) Gecko/20100101 Firefox/82.0',
@@ -75,6 +76,7 @@ def parsing_by_catalog_html_with_save_game_html():
             response = requests.get(url, headers=HEADERS)
             save_page(response.text, '{}//{}.html'.format(game_html, id))
             print(id)
+            time.sleep(5)
 
 
 # soup = BeautifulSoup(page_html, 'lxml')
