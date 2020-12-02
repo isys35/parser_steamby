@@ -306,6 +306,6 @@ if __name__ == '__main__':
     parsing_games(load_local_catalog_html=True,
                   load_local_game_html=True,
                   load_local_json=True,
-                  download_image=False,
-                  save_data_in_db=True,
+                  download_image=True,
+                  save_data_in_db=False,
                   html_save=False)
