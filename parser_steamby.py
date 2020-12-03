@@ -199,7 +199,12 @@ def parse_activation(data: dict):
 
 
 def parse_price(soup):
-    return int(soup.select_one('.product-price__cost').text.replace(' р', ''))
+    price_text = soup.select_one('.product-price__cost').text
+    if price_text == "Скоро":
+        price = 1999
+    else:
+        price = int(price_text.replace(' р', ''))
+    return price
 
 
 def parse_real_price(soup):
@@ -312,13 +317,13 @@ def parsing_games(load_local_catalog_html=True,
 if __name__ == '__main__':
     while True:
         try:
-            parsing_games(load_local_catalog_html=False,
-                          load_local_game_html=False,
-                          load_local_json=False,
-                          download_image=True,
-                          save_data_in_db=False,
-                          html_save=True,
-                          is_continue=True)
+            parsing_games(load_local_catalog_html=True,
+                          load_local_game_html=True,
+                          load_local_json=True,
+                          download_image=False,
+                          save_data_in_db=True,
+                          html_save=False,
+                          is_continue=False)
             break
         except ConnectionError:
             pass
