@@ -45,6 +45,7 @@ def make_dirs():
     os.mkdir(GAME_HTML_PATH)
     os.mkdir(GAME_JSON_PATH)
     os.mkdir(IMAGES_PATH)
+    os.mkdir(RESIZED_IMAGES_PATH)
 
 
 def save_page(response_str, file_name='page.html'):
