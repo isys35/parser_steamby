@@ -7,6 +7,7 @@ import json
 import re
 import db
 import httplib2
+from PIL import Image
 from pymysql.err import OperationalError
 
 HEADERS = {
@@ -33,6 +34,7 @@ CATALOG_HTML_PATH = 'catalog_html'
 GAME_HTML_PATH = 'game_html'
 GAME_JSON_PATH = 'game_json'
 IMAGES_PATH = 'images'
+RESIZED_IMAGES_PATH = 'images_292x136'
 
 GENRES = {'Аркады': 1, 'Экшен': 2, 'Ролевые': 3, 'Симуляторы': 4, 'Логические': 5, 'Файтинг': 6,
           'MMO': 7, 'Приключение': 8, 'Гонки': 9, 'Спорт': 10, 'Стратегии': 11, 'Прочее': 12}
@@ -314,16 +316,14 @@ def parsing_games(load_local_catalog_html=True,
                 save_json(game_json, game_json_path)
 
 
+def resizing_images(weiqht=292, height=136):
+    images_names = os.listdir(IMAGES_PATH)
+    for image_name in images_names:
+        img = Image.open("{}/{}".format(IMAGES_PATH, image_name))
+        resized_img = img.resize((weiqht, height))
+        resized_img.save("{}/{}".format(RESIZED_IMAGES_PATH, image_name))
+        print("{}/{}".format(RESIZED_IMAGES_PATH, image_name))
+
+
 if __name__ == '__main__':
-    while True:
-        try:
-            parsing_games(load_local_catalog_html=True,
-                          load_local_game_html=True,
-                          load_local_json=True,
-                          download_image=False,
-                          save_data_in_db=True,
-                          html_save=False,
-                          is_continue=False)
-            break
-        except ConnectionError:
-            pass
+    resizing_images()
