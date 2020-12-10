@@ -71,7 +71,7 @@ def get_data_from_html(html):
     for product_soup in soup.select('div.product-item'):
         product_id = int(product_soup.select_one('.product-item__btn')['data-id'])
         product_name = product_soup.select_one('a.product-item__title-link').text
-        product_price_soup = product_soup.select_one('a.product-item__cost')
+        product_price_soup = product_soup.select_one('.product-item__cost')
         if product_price_soup:
             product_price = product_price_soup.text
         else:
