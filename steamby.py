@@ -48,7 +48,7 @@ def write_scv_headers(file_name=DATA_FILE_CSV):
     """
     Создание шапки в .csv файле
     """
-    with open(file_name, 'w', encoding='cp1251') as csv_file:
+    with open(file_name, 'w', encoding='utf8') as csv_file:
         writer = csv.writer(csv_file, delimiter=';')
         writer.writerow(['id', 'Название', 'Цена'])
 
@@ -57,7 +57,7 @@ def save_data(data, file_name=DATA_FILE_CSV):
     """
     Сохранение данных
     """
-    with open(file_name, 'a', encoding='cp1251') as csv_file:
+    with open(file_name, 'a', encoding='utf8') as csv_file:
         writer = csv.writer(csv_file, delimiter=';')
         writer.writerows(data)
 
